@@ -147,3 +147,14 @@ data Merged_Medicare;
 	merge &alldata;
 		by BENE_ID;
 run;
+
+/*Save merged data set as csv file*/
+proc export data=WORK.Merged_Medicare
+    outfile='Merged_Medicare.csv'
+    dbms=csv
+    replace;
+run;
+
+
+
+
