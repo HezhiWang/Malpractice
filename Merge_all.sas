@@ -132,7 +132,7 @@ run;
 
 
 
-/*Merge add Merged dataset*/
+/*Merge all part of merged Medicare dataset*/
 
 proc sql;
 select catt(libname,'.',memname)
@@ -155,6 +155,6 @@ proc export data=WORK.Merged_Medicare
     replace;
 run;
 
-
+/*Merge merged Medicare dataset with */
 
 
