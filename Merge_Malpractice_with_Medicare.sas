@@ -29,11 +29,16 @@ quit;
 data Merged_all;
 	set Merged_all;
 	year_diff = 1;
+	Target = 1;
+	year_Medicare = SRVC_DT;
 run;
+
+
 
 data Merged_all;
 	set Merged_all;
-	year_diff = year1 - year2;
+	year_diff = year_Medicare - year_Malpractice;
+	Target = 
 run;
 
 

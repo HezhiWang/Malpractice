@@ -132,7 +132,53 @@ run;
 
 
 
-/*Merge all part of merged Medicare dataset*/
+/*Merge all part of merged Medicare dataset using Merged_pardD_event dataset left join others*/
+
+proc sql;
+        create table Merged_Medicare_1 as
+        select Merged_pardD_event.*, Merged_part_B_carrier.*
+        from Merged_pardD_event left join Merged_part_B_carrier
+        on Merged_pardD_event.BENE_ID = Merged_part_B_carrier.BENE_ID;
+quit;
+
+proc sql;
+        create table Merged_Medicare_2 as
+        select Merged_Medicare_1.*, Merged_Home_Health_Claims_Base_Claim.*
+        from Merged_Medicare_1 left join Merged_Home_Health_Claims_Base_Claim
+        on Merged_Medicare_1.BENE_ID = Merged_Home_Health_Claims_Base_Claim.BENE_ID;
+quit;
+
+proc sql;
+        create table Merged_Medicare_3 as
+        select Merged_Medicare_2.*, Merged_Master_Beneficiary_Summary_File_AB_Enrollment.*
+        from Merged_Medicare_2 left join Merged_Master_Beneficiary_Summary_File_AB_Enrollment
+        on Merged_Medicare_2.BENE_ID = Merged_Master_Beneficiary_Summary_File_AB_Enrollment.BENE_ID;
+quit;
+
+proc sql;
+        create table Merged_Medicare_4 as
+        select Merged_Medicare_3.*, Merged_Master_Beneficiary_Summary_File_Cost_and_Use.*
+        from Merged_Medicare_3 left join Merged_Master_Beneficiary_Summary_File_Cost_and_Use
+        on Merged_Medicare_3.BENE_ID = Merged_Master_Beneficiary_Summary_File_Cost_and_Use.BENE_ID;
+quit;
+
+proc sql;
+        create table Merged_Medicare_5 as
+        select Merged_Medicare_4.*, Merged_Master_Beneficiary_Summary_File_NDI.*
+        from Merged_Medicare_4 left join Merged_Master_Beneficiary_Summary_File_NDI
+        on Merged_Medicare_4.BENE_ID = Merged_Master_Beneficiary_Summary_File_NDI.BENE_ID;
+quit;
+
+proc sql;
+        create table Merged_Medicare as
+        select Merged_Medicare_5.*, Merged_Medpar.*
+        from Merged_Medicare_5 left join Merged_Medpar
+        on Merged_Medicare_5.BENE_ID = Merged_Medpar.BENE_ID;
+quit;
+
+
+/*
+Merged_pardD_event, Merged_part_B_carrier, Merged_Home_Health_Claims_Base_Claim, Merged_Master_Beneficiary_Summary_File_AB_Enrollment, Merged_Master_Beneficiary_Summary_File_Cost_and_Use, Merged_Master_Beneficiary_Summary_File_NDI, Merged_Medpar
 
 proc sql;
 select catt(libname,'.',memname)
@@ -147,6 +193,9 @@ data Merged_Medicare;
 	merge &alldata;
 		by BENE_ID;
 run;
+*/
+
+
 
 /*Save merged data set as csv file*/
 proc export data=WORK.Merged_Medicare
@@ -155,6 +204,94 @@ proc export data=WORK.Merged_Medicare
     replace;
 run;
 
-/*Merge merged Medicare dataset with */
+
+/*Merge merged Medicare with AMA master file by npi*/
+
+/*First please upload AMA master file into SAS WORD Library, and name it as 'AMA_master'*/
+
+/*This step will drop rows that 'PRSCRBR_ID_QLFYR_CD' != '01' from the Merged_Medicare dataset.*/
+
+/*And change column 'PRSCRBR_ID' to name 'npi' in the dataset Medicare_delete_without_npi*/
+
+DATA Medicare_delete_without_npi;
+    SET Merged_Medicare(rename= (PRSCRBR_ID = npi));
+    IF (PRSCRBR_ID_QLFYR_CD ^= '01') THEN DELETE;
+RUN;
+
+/*Then we will merge Medicare_delete_without_npi dataset with AMA_master dataset*/
+
+/*inner join Medicare with AMA master by npi*/
+/*
+proc sort data = AMA_master;
+by npi;
+proc sort data = Medicare_delete_without_npi;
+by npi;
+data Merged_Medicare_with_AMA;
+        merge Medicare_delete_without_npi AMA_master;
+        by npi;
+run;*/
+
+proc sql;
+        create table Merged_Medicare_with_AMA as
+        select Medicare_delete_without_npi.*, AMA_master.*
+        from Medicare_delete_without_npi inner join AMA_master
+        on Malpractice.npi = Merged_Medicare_with_AMA.npi;
+quit;
 
 
+
+/*Add variable Target to the Malpractice dataset*/
+data Malpractice;
+        set Malpractice;
+        Target = 1;
+run;
+
+
+/*Merge the above merged file with Malpractice dataset*/
+proc sql;
+        create table Merged_all as
+        select Merged_Medicare_with_AMA.*, Malpractice.*
+        from Merged_Medicare_with_AMA left join Malpractice
+        on Malpractice.npi = Merged_Medicare_with_AMA.npi;
+quit;
+
+/*
+proc sort data = Malpractice;
+by npi;
+proc sort data = Merged_Medicare_with_AMA;
+by npi;
+data Merged_all;
+    merge Merged_Medicare_with_AMA Malpractice;
+    by npi;
+*/
+
+
+proc sql;
+        update Merged_all 
+	    set Target = 0
+        where Target is NULL;
+quit;
+
+data Merged_all;
+	set Merged_all;
+	year_diff = 1;
+	Target = 1;
+    year_Medicare = YEAR(SRVC_DT);
+run;
+
+/*
+proc sql;
+        update Merged_all 
+        set year_Medicare = YEAR(year_Medicare);
+quit;*/
+
+data Merged_all;
+	set Merged_all;
+	year_diff = year_Medicare - year_Malpractice;
+run;
+
+proc sql;
+        update Merged_all 
+        set Target = 0.6 ** year_diff
+        where year_diff < 5;
+quit;
