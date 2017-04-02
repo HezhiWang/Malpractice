@@ -1,0 +1,21 @@
+====The Data Preprocessing Procedure====
+1. Merge selected Medicare dataset by "BENE_ID"
+* This is to get a broader set of features in the whole medicare dataset. 
+* The central part is the PDE datafile which contains information about prescribers in "PRSCRBR_ID_QLFYR_CD" and "PRSCRBR_ID".
+The "PRSCRBR_ID" consists of multiple types, the major part being "NPI", when "PRSCRBR_ID_QLFYR_CD" = "01".
+* We first concatenate datafiles of the same type but in different years. Then we perform a left join, the left being the PDE data, and the right being all other datafiles.
+* Create a column "year_medicare" based on "SRVC_DT" in PDE, which is to indicate the year of the service.
+
+2. Merge AMA master file with Medicare by "NPI" --> Medicare_AMA
+* This is to add characteristics of prescribers.
+* The identifier for practitiioners in AMA is "NPI". So for simplicity, we first drop all records in Medicare that "PRSCRBR_ID" is not a NPI, i.e. "PRSCRBR_ID_QLFYR_CD" ^= "01". Next we perform an inner join of the two dataset by NPI.
+
+3. Process FL malpractice dataset
+* Firstly, FL malpractice dataset is merged with FL Health Care Practitioner Data Portal - Licensee Profile Master Table(https://appsmqa.doh.state.fl.us/downloadnet/Profile.aspx) using "phyid" (which is state license number) to get name and address and other information about prctitioners with malpractice claims. --> malpractice_result_new.csv
+* Secondly, in order to merge malpractice with Medicare_AMA, we need to have NPI. Here we use The NPI Registry Public Search, which is a free directory of all active National Provider Identifier (NPI) records. (https://npiregistry.cms.hhs.gov/). We made use of the API and wrote a webscraper with Python to match NPI by name. The NPI fetched is cross validated by other columns like state and license number. Even so, this process is still extremely messy and still a lot of matching has to be done manually. Then all practitioners without a NPI are dropped.
+* Create one column "year_malpractice" to indicate year the injury occured, and one column "Target" which is an indicator for mlpractice (i.e. all values in this column being 1) . This is used for future merging with Medicare_AMA to serve as the dummy for malpractice.
+
+4. Merge FL malpractice with Medicare_AMA 
+* Merge the cleaned FL malpractice dataset with Medicare_AMA by "NPI". This is a left join, the left being Medicare_AMA.
+* Create a new column "YEAR_DIFF", which is "year_medicare" - "year_malpractice".
+* For the "Target" column, fill all NA values by 0. Otherwise, if "year_diff" < 0 or "year_diff" > 5, change "Target" value to 0. If "year_diff" = 0, the value remain to be 1. Else if "year_diff" is within [1,5], the value is set to be 0.6^year_diff. This serves like a exponential kernel that weighs the recent past highly and decays the weight exponentially as time passes. 
