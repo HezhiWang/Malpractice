@@ -35,6 +35,7 @@ run;
 
 
 
+
 data Merged_all;
 	set Merged_all;
 	year_diff = year_Medicare - year_Malpractice;
