@@ -276,7 +276,7 @@ data Merged_all;
 	set Merged_all;
 	year_diff = 1;
 	Target = 1;
-    year_Medicare = YEAR(SRVC_DT);
+    	year_Medicare = YEAR(SRVC_DT);
 run;
 
 /*
@@ -294,4 +294,12 @@ proc sql;
         update Merged_all 
         set Target = 0.6 ** year_diff
         where year_diff < 5;
+quit;
+
+/*Get all physicians in FL*/
+proc sql;
+        create table physicians_FL as
+        select Merged_all.*
+        from Merged_all
+        where (Target = 1 or (Target = 0 and MailState = 'FL'));
 quit;
