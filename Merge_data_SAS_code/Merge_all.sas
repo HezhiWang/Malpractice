@@ -5,7 +5,7 @@ proc sql;
 select catt(libname,'.',memname) 
 into :alldata separated by ' ' 
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^pde.*/', memname);
+where libname = 'IN028516' and prxmatch('/^pde.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -20,7 +20,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^bcarclmsj.*/', memname);
+where libname = 'IN028516' and prxmatch('/^bcarclmsj.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -41,7 +41,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^hhaclmsj.*/', memname);
+where libname = 'IN028516' and prxmatch('/^hhaclmsj.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -60,7 +60,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_ab.*/', memname);
+where libname = 'IN028516' and prxmatch('/^mbsf_ab.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -80,7 +80,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_cu.*/', memname);
+where libname = 'IN028516' and prxmatch('/^mbsf_cu.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -95,7 +95,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_ndi.*/', memname);
+where libname = 'IN028516' and prxmatch('/^mbsf_ndi.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -114,7 +114,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^medpar.*/', memname);
+where libname = 'IN028516' and prxmatch('/^medpar.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -175,27 +175,6 @@ proc sql;
         from Merged_Medicare_5 left join Merged_Medpar
         on Merged_Medicare_5.BENE_ID = Merged_Medpar.BENE_ID;
 quit;
-
-
-/*
-Merged_pardD_event, Merged_part_B_carrier, Merged_Home_Health_Claims_Base_Claim, Merged_Master_Beneficiary_Summary_File_AB_Enrollment, Merged_Master_Beneficiary_Summary_File_Cost_and_Use, Merged_Master_Beneficiary_Summary_File_NDI, Merged_Medpar
-
-proc sql;
-select catt(libname,'.',memname)
-into :alldata separated by ' '
-from dictionary.tables
-where libname = 'WORK' and prxmatch('/^Merged.*/', memname);
-quit;
-
-%put The names of the files to concatenate are: &alldata;
-
-data Merged_Medicare;
-	merge &alldata;
-		by BENE_ID;
-run;
-*/
-
-
 
 /*Save merged data set as csv file*/
 proc export data=WORK.Merged_Medicare
