@@ -183,6 +183,13 @@ proc export data=WORK.Merged_Medicare
     replace;
 run;
 
+FILENAME REFFILE '/Files/_uploads/ama-master.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.AMA_master;
+	GETNAMES=YES;
+RUN;
 
 /*Merge merged Medicare with AMA master file by npi*/
 
@@ -218,6 +225,13 @@ proc sql;
 quit;
 
 
+FILENAME REFFILE '/Files/_uploads/malpractice.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.Malpractice;
+	GETNAMES=YES;
+RUN;
 
 /*Add variable Target to the Malpractice dataset*/
 data Malpractice;
