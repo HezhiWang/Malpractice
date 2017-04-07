@@ -176,27 +176,6 @@ proc sql;
         on Merged_Medicare_5.BENE_ID = Merged_Medpar.BENE_ID;
 quit;
 
-
-/*
-Merged_pardD_event, Merged_part_B_carrier, Merged_Home_Health_Claims_Base_Claim, Merged_Master_Beneficiary_Summary_File_AB_Enrollment, Merged_Master_Beneficiary_Summary_File_Cost_and_Use, Merged_Master_Beneficiary_Summary_File_NDI, Merged_Medpar
-
-proc sql;
-select catt(libname,'.',memname)
-into :alldata separated by ' '
-from dictionary.tables
-where libname = 'WORK' and prxmatch('/^Merged.*/', memname);
-quit;
-
-%put The names of the files to concatenate are: &alldata;
-
-data Merged_Medicare;
-	merge &alldata;
-		by BENE_ID;
-run;
-*/
-
-
-
 /*Save merged data set as csv file*/
 proc export data=WORK.Merged_Medicare
     outfile='Merged_Medicare.csv'
