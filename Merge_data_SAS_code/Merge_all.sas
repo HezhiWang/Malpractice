@@ -207,15 +207,6 @@ RUN;
 /*Then we will merge Medicare_delete_without_npi dataset with AMA_master dataset*/
 
 /*inner join Medicare with AMA master by npi*/
-/*
-proc sort data = AMA_master;
-by npi;
-proc sort data = Medicare_delete_without_npi;
-by npi;
-data Merged_Medicare_with_AMA;
-        merge Medicare_delete_without_npi AMA_master;
-        by npi;
-run;*/
 
 proc sql;
         create table Merged_Medicare_with_AMA as
@@ -248,17 +239,6 @@ proc sql;
         on Malpractice.npi = Merged_Medicare_with_AMA.npi;
 quit;
 
-/*
-proc sort data = Malpractice;
-by npi;
-proc sort data = Merged_Medicare_with_AMA;
-by npi;
-data Merged_all;
-    merge Merged_Medicare_with_AMA Malpractice;
-    by npi;
-*/
-
-
 proc sql;
         update Merged_all 
 	    set Target = 0
@@ -271,12 +251,6 @@ data Merged_all;
 	Target = 1;
     	year_Medicare = YEAR(SRVC_DT);
 run;
-
-/*
-proc sql;
-        update Merged_all 
-        set year_Medicare = YEAR(year_Medicare);
-quit;*/
 
 data Merged_all;
 	set Merged_all;
