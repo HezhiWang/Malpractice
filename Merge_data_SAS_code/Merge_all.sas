@@ -5,7 +5,7 @@ proc sql;
 select catt(libname,'.',memname) 
 into :alldata separated by ' ' 
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^pde.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^PDE.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -20,7 +20,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^bcarclmsj.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^BCARCLMSJ.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -41,7 +41,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^hhaclmsj.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^HHACLMSJ.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -60,7 +60,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_ab.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^MBSF_AB.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -80,7 +80,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_cu.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^MBSF_CU.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -95,7 +95,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^mbsf_ndi.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^MBSF_NDI.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
@@ -114,7 +114,7 @@ proc sql;
 select catt(libname,'.',memname)
 into :alldata separated by ' '
 from dictionary.tables
-where libname = 'IN028516' and prxmatch('/^medpar.*/', memname) > 0;
+where libname = 'IN028516' and prxmatch('/^MEDPAR.*/', memname) > 0;
 quit;
 
 %put The names of the files to concatenate are: &alldata;
