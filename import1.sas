@@ -1,14 +1,13 @@
 &myfiles_root./_uploads
 
 
-filename csv "&myfiles_root./_uploads/ama-master.csv" lrecl=256;
-
+filename csv1 "&myfiles_root./_uploads/ama-master.csv" lrecl=256;
 data AMA_master;
- infile csv dlm=',' dsd truncover;
+ infile csv1 dlm=',' dsd truncover;
 run;
 
-ilename csv "&myfiles_root./_uploads/malpractice.csv" lrecl=256;
 
-data  Malpractice;
- infile csv dlm=',' dsd truncover;
+filename csv2 "&myfiles_root./_uploads/malpractice.csv" lrecl=256;
+data Malpractice;
+ infile csv2 dlm=',' dsd truncover;
 run;
