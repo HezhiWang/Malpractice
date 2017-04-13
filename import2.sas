@@ -1,4 +1,4 @@
-FILENAME REFFILE '/Files/_uploads/ama-master.csv';
+FILENAME REFFILE '/sas/vrdc/users/dch070/files/_uploads/ama-master.csv';
 
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
@@ -6,7 +6,7 @@ PROC IMPORT DATAFILE=REFFILE
 	GETNAMES=YES;
 RUN;
 
-FILENAME REFFILE '/Files/_uploads/malpractice.csv';
+FILENAME REFFILE '/sas/vrdc/users/dch070/files/_uploads/malpractice.csv';
 
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
