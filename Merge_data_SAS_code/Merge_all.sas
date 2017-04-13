@@ -204,9 +204,9 @@ RUN;
 
 proc sql;
         create table Merged_Medicare_with_AMA as
-        select Medicare_delete_without_npi.*, AMA_master.*
-        from Medicare_delete_without_npi inner join AMA_master
-        on Malpractice.npi = Merged_Medicare_with_AMA.npi;
+        select Medicare_delete_without_npi.*, SASUSER.AMA_master.*
+        from Medicare_delete_without_npi inner join SASUSER.AMA_master
+        on Medicare_delete_without_npi.npi = SASUSER.AMA_master.npi;
 quit;
 
 /*Add variable Target to the Malpractice dataset*/
@@ -219,7 +219,7 @@ run;
 /*Merge the above merged file with Malpractice dataset*/
 proc sql;
         create table Merged_all as
-        select Merged_Medicare_with_AMA.*, Malpractice.*
+        select Merged_Medicare_with_AMA.*, SASUSER.Malpractice.*
         from Merged_Medicare_with_AMA left join Malpractice
         on Malpractice.npi = Merged_Medicare_with_AMA.npi;
 quit;
