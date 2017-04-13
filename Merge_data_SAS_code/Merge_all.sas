@@ -176,11 +176,9 @@ proc sql;
         on Merged_Medicare_5.BENE_ID = Merged_Medpar.BENE_ID;
 quit;
 
-/*Save merged data set as csv file*/
-proc export data=WORK.Merged_Medicare
-    outfile='Merged_Medicare.csv'
-    dbms=csv
-    replace;
+/*Save merged data set to SASUSER*/
+data SASUSER.Merged_Medicare;
+set Merged_Medicare;
 run;
 
 
@@ -211,7 +209,7 @@ quit;
 
 /*Add variable Target to the Malpractice dataset*/
 data Malpractice;
-        set Malpractice;
+        set SASUSER.Malpractice;
         Target = 1;
 run;
 
@@ -219,7 +217,7 @@ run;
 /*Merge the above merged file with Malpractice dataset*/
 proc sql;
         create table Merged_all as
-        select Merged_Medicare_with_AMA.*, SASUSER.Malpractice.*
+        select Merged_Medicare_with_AMA.*, Malpractice.*
         from Merged_Medicare_with_AMA left join Malpractice
         on Malpractice.npi = Merged_Medicare_with_AMA.npi;
 quit;
@@ -248,6 +246,10 @@ proc sql;
         where year_diff < 5;
 quit;
 
+data SASUSER.Merged_all;
+    set Merged_all;
+run;
+
 /*Get all physicians in FL*/
 proc sql;
         create table physicians_FL as
@@ -255,3 +257,7 @@ proc sql;
         from Merged_all
         where (Target = 1 or (Target = 0 and MailState = 'FL'));
 quit;
+
+data SASUSER.physicians_FL;
+    set physicians_FL;
+run;
