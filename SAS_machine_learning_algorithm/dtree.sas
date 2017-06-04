@@ -1,19 +1,8 @@
-data dtree;
-input targ age sex$ job$;
-datalines;
-1 20 f a
-0.1 25 m b
-0.8 35 f b
-0.4 28 m c
-1 34 f c
-0 20 f d
-;
-run;
-
+/*Import dataset dtree.csv to WORK linrary and named it as DTREE*/
 
 /*split dataset to training set and testing set (7:3)*/
 data temp;
-set dtree;
+set DTREE;
 n=ranuni(8);
 proc sort data=temp;
   by n;
@@ -23,9 +12,17 @@ proc sort data=temp;
     else output testing;
    run;
 
+data train;
+set training(keep = JOB sex age targ);
+run;
+
+data test;
+set testing(keep = JOB sex age targ);
+run;
+
 /*Fiting the traing dataset to dataset training, and save the split rules as 'dtree-rules.txt' and save the model as 'hpspldtree-code.sas'*/
 
-proc hpsplit data=training maxdepth=2 maxbranch=2;
+proc hpsplit data=training maxdepth=200 maxbranch=;
 	target targ;
 	input JOB sex / level=nom;
 	input age  / level=int;
