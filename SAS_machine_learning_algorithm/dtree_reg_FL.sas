@@ -1,4 +1,4 @@
- /*split dataset to training set and testing set (7:3)*/
+/*split dataset to training set and testing set (7:3)*/
 data temp;
 set DCH070SL.Merged_all;
 n=ranuni(8);
@@ -28,7 +28,7 @@ proc hpsplit data=train leafsize=&Val_leafsize maxdepth = &Val_maxdepth mincatsi
   input sex PrimarySpecialty MedTrainFlag USTrained / level=nom;
 
   	criterion VARIANCE;
-  	prune ASE / ASE >= 0.5;
+  	prune ASE / ASE >= 1.0;
   	partition fraction(validate=0.2);
   	rules file='/sas/vrdc/users/dch070/files/_uploads/dtree-rules.txt';
   	code file = '/sas/vrdc/users/dch070/files/_uploads/hpspldtree-code.sas';
@@ -40,52 +40,10 @@ set test;
 	%include '/sas/vrdc/users/dch070/files/_uploads/hpspldtree-code.sas';
 run;
 
-data scored_dtree&index;
-set scored_dtree&index;
-error = (Target - P_Target) * (Target - P_Target);
-run;
-
-data DCH070SL.scored_dtree&index;
-    set scored_dtree&index;
-    retain sum 0 sum_;
-    sum=sum+error;
-run;
-
-proc sql;
-create table DCH070SL.SquaredError&index as 
-select max(sum) as Squared_Error
-from scored_dtree&index;
-run;quit;
-
 %MEND hpdtree;
 
-%hpdtree(Val_leafsize = 2, Val_maxdepth = 20, index = 1);
-%hpdtree(Val_leafsize = 4, Val_maxdepth = 20, index = 2);
-%hpdtree(Val_leafsize = 8, Val_maxdepth = 20, index = 3);
-%hpdtree(Val_leafsize = 16, Val_maxdepth = 20, index = 4);
-%hpdtree(Val_leafsize = 32, Val_maxdepth = 20, index = 5);
-%hpdtree(Val_leafsize = 64, Val_maxdepth = 20, index = 6);
-%hpdtree(Val_leafsize = 128, Val_maxdepth = 20, index = 7);
-%hpdtree(Val_leafsize = 256, Val_maxdepth = 20, index = 5);
-%hpdtree(Val_leafsize = 512, Val_maxdepth = 20, index = 6);
-%hpdtree(Val_leafsize = 1024, Val_maxdepth = 20, index = 7);
+%hpdtree(Val_maxdepth = 20, index = 1);
+/*%hpdtree(Val_maxdepth = 30, index = 2);
+%hpdtree(Val_maxdepth = 50, index = 3);*/
 
 ODS GRAPHICS OFF;
-
-proc sql;
-select catt(libname,'.',memname)
-into :alldata separated by ' '
-from dictionary.tables
-where libname = 'DCH070SL' and prxmatch('/^SquaredError.*/', memname) > 0;
-quit;
-data DCH070SL.RESULTS;
-set &alldata;
-keep Squared_Error;
-run;
-
-proc print data = DCH070SL.RESULTS;run;
-
-
-
-
-

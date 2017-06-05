@@ -11,6 +11,3 @@ proc glmselect data=DCH070SL.Merged_all
            / selection=stepwise(choose=CP steps=20);
 run;
 ods graphics off;
-
-
-/*avg_num_phyvis_CLAIM avg_er_vis_CLAIM avg_er_vis_PDE avg_num_phyvis_PDE avg_loscnt avg_mdcr_pmt_amt*/
